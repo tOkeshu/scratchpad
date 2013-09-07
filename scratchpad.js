@@ -55,5 +55,31 @@ var Scratchpad = (function() {
     this.emit("change", this.data);
   };
 
+  // Based on https://github.com/share/ShareJS/blob/master/lib/client/textarea.js
+  Scratchpad.prototype.computeOp = function(oldval, newval) {
+    if (oldval === newval) return;
+
+    var commonStart = 0;
+    while (oldval.charAt(commonStart) === newval.charAt(commonStart)) {
+      commonStart++;
+    }
+
+    var commonEnd = 0;
+    while (oldval.charAt(oldval.length - 1 - commonEnd) === newval.charAt(newval.length - 1 - commonEnd) &&
+           commonEnd + commonStart < oldval.length && commonEnd + commonStart < newval.length) {
+      commonEnd++;
+    }
+
+    if (oldval.length !== commonStart + commonEnd) {
+      var deletion = oldval.slice(commonStart, oldval.length - commonEnd);
+      return ["sd", [], [deletion, commonStart]];
+    }
+
+    if (newval.length !== commonStart + commonEnd) {
+      var insertion = newval.slice(commonStart, newval.length - commonEnd);
+      return ["si", [], [insertion, commonStart]];
+    }
+  };
+
   return Scratchpad;
 }());

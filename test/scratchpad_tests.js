@@ -53,6 +53,28 @@ describe("Scratchpad", function() {
     });
 
   });
+
+  describe("#computeOp", function() {
+
+    it("should create a si op", function() {
+      var scratchpad = new Scratchpad();
+      var oldval = ""
+      var newval = "foo";
+
+      expect(scratchpad.computeOp(oldval, newval))
+        .to.eql(["si", [], ["foo", 0]]);
+    });
+
+    it("should create a sd op", function() {
+      var scratchpad = new Scratchpad();
+      var oldval = "foo"
+      var newval = "";
+
+      expect(scratchpad.computeOp(oldval, newval))
+        .to.eql(["sd", [], ["foo", 0]]);
+    });
+
+  });
 });
 
 describe("Queue", function() {
