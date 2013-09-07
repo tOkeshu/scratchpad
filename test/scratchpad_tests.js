@@ -1,4 +1,5 @@
 describe("Scratchpad", function() {
+
   describe("constructor", function() {
     it("should have a data property", function() {
       var scratchpad = new Scratchpad();
@@ -30,11 +31,34 @@ describe("Scratchpad", function() {
 
       scratchpad.apply(["si", [], ["abc", 0]]);
     });
+
+    it("should queue the op if not transformed", function() {
+      var scratchpad = new Scratchpad();
+
+      scratchpad.apply(["si", [], ["abc", 0]]);
+
+      expect(scratchpad.queue.toTrQueue(0)).to.eql([["si", [], ["abc", 0]]]);
+    });
+
+    it("should transform the op if asked", function() {
+      var scratchpad = new Scratchpad();
+
+      scratchpad.apply(["si", [], ["abc", 0]]);
+      scratchpad.apply(["si", [], ["def", 0]], {
+        transform: true,
+        version: 0
+      });
+
+      expect(scratchpad.data).to.equal("abcdef");
+    });
+
   });
 });
 
 describe("Queue", function() {
+
   describe("constructor", function() {
+
     it("should have a size property", function() {
       var queue = new Queue(10);
       expect(queue.size).to.equal(10);
@@ -49,9 +73,11 @@ describe("Queue", function() {
       var queue = new Queue(10);
       expect(queue.version).to.equal(0);
     });
+
   });
 
   describe("#push", function() {
+
     it("should add an item to the queue", function() {
       var queue = new Queue(10);
       queue.push("item1");
@@ -70,6 +96,7 @@ describe("Queue", function() {
   });
 
   describe("#toTrQueue", function() {
+
     it("should return an array of items", function() {
       var queue = new Queue(10);
       queue.push("item1");
@@ -85,5 +112,6 @@ describe("Queue", function() {
       queue.push("item3");
       expect(queue.toTrQueue(2)).to.eql(["item3"]);
     });
+
   });
 });

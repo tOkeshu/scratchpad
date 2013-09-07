@@ -46,6 +46,11 @@ var Scratchpad = (function() {
   Scratchpad.prototype.emit = Scratchpad.prototype.trigger;
 
   Scratchpad.prototype.apply = function(op, options) {
+    if (options && options.transform)
+      op = ot.transform(op, this.queue.toTrQueue(options.version));
+    else
+      this.queue.push(op);
+
     this.data = ot.apply(this.data, op);
     this.emit("change", this.data);
   };
