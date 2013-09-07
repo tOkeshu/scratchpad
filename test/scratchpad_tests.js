@@ -4,6 +4,11 @@ describe("Scratchpad", function() {
       var scratchpad = new Scratchpad();
       expect(scratchpad.data).to.not.equal(undefined);
     });
+
+    it("should have a queue property", function() {
+      var scratchpad = new Scratchpad();
+      expect(scratchpad.queue).to.a(Queue);
+    });
   });
 
   describe("#apply", function() {

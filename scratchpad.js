@@ -37,6 +37,7 @@ var Scratchpad = (function() {
 
   function Scratchpad() {
     this.data = "";
+    this.queue = new Queue(10);
   }
 
   MicroEvent.mixin(Scratchpad);
