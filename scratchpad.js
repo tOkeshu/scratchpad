@@ -52,7 +52,8 @@ var Scratchpad = (function() {
       this.queue.push(op);
 
     this.data = ot.apply(this.data, op);
-    this.emit("change", this.data);
+
+    this.emit("change", this.data, op, !!(options && options.local));
   };
 
   // Based on https://github.com/share/ShareJS/blob/master/lib/client/textarea.js

@@ -24,12 +24,31 @@ describe("Scratchpad", function() {
 
     it("should emit an change event", function(done) {
       var scratchpad = new Scratchpad();
-      scratchpad.on("change", function(data) {
+      scratchpad.on("change", function(data, op) {
         expect(data).to.equal("abc");
+        expect(op).to.eql(["si", [], ["abc", 0]]);
         done();
       });
 
       scratchpad.apply(["si", [], ["abc", 0]]);
+    });
+
+    it("should say if the change is local or not", function(done) {
+      var n = 1;
+      var scratchpad = new Scratchpad();
+      scratchpad.on("change", function(data, op, local) {
+        if (n === 1)
+          expect(local).to.equal(false);
+        else if (n === 2) {
+          expect(local).to.equal(true);
+          done();
+        }
+
+        n += 1;
+      });
+
+      scratchpad.apply(["si", [], ["abc", 0]]);
+      scratchpad.apply(["si", [], ["abc", 0]], {local: true});
     });
 
     it("should queue the op if not transformed", function() {
