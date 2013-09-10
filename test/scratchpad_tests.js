@@ -156,3 +156,101 @@ describe("Queue", function() {
 
   });
 });
+
+describe("ScratchArea", function() {
+
+  describe("constructor", function() {
+
+    it("should have a node and a transport property", function() {
+      var node = document.querySelector("textarea");
+      var transport = {};
+      var scratcharea = new ScratchArea({
+        node: node,
+        transport: transport
+      });
+      expect(scratcharea.node).to.equal(node);
+      expect(scratcharea.transport).to.equal(transport);
+    });
+
+    it("should have a scratchpad property", function() {
+      var node = document.querySelector("textarea");
+      var scratcharea = new ScratchArea({
+        node: node,
+        transport: {}
+      });
+      expect(scratcharea.scratchpad).to.be.a(Scratchpad);
+    });
+
+  });
+
+  describe("incoming 'op' event", function() {
+
+    it("should apply the op to the pad", function() {
+      var dc = {}
+      var textarea = document.querySelector("textarea");
+      var scratcharea = new ScratchArea({
+        node: textarea,
+        transport: dc
+      });
+      var event = {data: JSON.stringify({op: ["si", [], ["abc", 0]], v: 0})}
+
+      dc.onmessage(event);
+
+      expect(textarea.value).to.equal("abc");
+    });
+
+    it("should move the cursor appropriately", function() {
+      var dc = {}
+      var textarea = document.querySelector("textarea");
+      var scratcharea = new ScratchArea({
+        node: textarea,
+        transport: dc
+      });
+      var event = {data: JSON.stringify({op: ["si", [], ["abc", 0]], v: 0})}
+      textarea.selectionStart = 7;
+
+      dc.onmessage(event);
+
+      expect(textarea.selectionStart).to.equal(10);
+      expect(textarea.selectionEnd).to.equal(10);
+    });
+
+  });
+
+  describe("outgoing 'op' event", function() {
+
+    it("should be triggered if the textarea change", function(done) {
+      var scratcharea, textarea, dc;
+      dc = {send: function(data) {
+        var data = JSON.parse(data);
+        expect(data).to.eql({op: ["si", [], ["abc", 0]]});
+        scratcharea.stop();
+        done();
+      }};
+      textarea = document.querySelector("textarea");
+      scratcharea = new ScratchArea({
+        node: textarea,
+        transport: dc
+      }).monitor(10);
+
+      textarea.value = "abc";
+    });
+  });
+
+  describe("ScratchPad change", function() {
+
+    it("should store the content in localStorage", function() {
+      var textarea = document.querySelector("textarea");
+      var scratcharea = new ScratchArea({
+        node: textarea,
+        transport: {send: function() {}},
+        localstorage: "an id"
+      });
+
+      scratcharea.scratchpad.trigger("change", "abc", null, true);
+      expect(localStorage.getItem("an id")).to.equal("abc");
+    });
+
+  });
+});
+

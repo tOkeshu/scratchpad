@@ -52,7 +52,6 @@ var Scratchpad = (function() {
       this.queue.push(op);
 
     this.data = ot.apply(this.data, op);
-
     this.emit("change", this.data, op, !!(options && options.local));
   };
 
@@ -84,3 +83,64 @@ var Scratchpad = (function() {
 
   return Scratchpad;
 }());
+
+var ScratchArea = (function() {
+  function ScratchArea(properties) {
+    this.node = properties.node;
+    this.transport = properties.transport;
+    this.scratchpad = new Scratchpad();
+    this._monitoring = undefined;
+
+    this.transport.onmessage = this._onMessage.bind(this);
+    this.scratchpad.on("change", this._onChange.bind(this));
+
+    if (properties.localstorage)
+      this.scratchpad.on("change",
+                         this._store.bind(this, properties.localstorage));
+  };
+
+  ScratchArea.prototype.monitor = function(interval) {
+    this.monitoring = setInterval(function() {
+      var scratchpad = this.scratchpad;
+      var node = this.node;
+
+      var op = scratchpad.computeOp(scratchpad.data, node.value);
+      if (op)
+        scratchpad.apply(op, {local: true});
+    }.bind(this), interval);
+
+    return this;
+  };
+
+  ScratchArea.prototype.stop = function() {
+    clearInterval(this.monitoring);
+    return this;
+  };
+
+  ScratchArea.prototype._onMessage = function(event) {
+    var data = JSON.parse(event.data);
+    this.scratchpad.apply(data.op);
+  };
+
+  ScratchArea.prototype._onChange = function(data, op, local) {
+    if (local)
+      return this.transport.send(JSON.stringify({op: op}));
+
+    var cursor = this.node.selectionStart;
+    this.node.value = data;
+
+    if (op[0] === "si" && op[2][1] < cursor)
+      cursor = cursor += op[2][0].length;
+    if (op[0] === "sd" && op[2][1] < cursor)
+      cursor = cursor -= op[2][0].length;
+
+    this.node.selectionStart = this.node.selectionEnd = cursor;
+  };
+
+  ScratchArea.prototype._store = function(id, data) {
+    localStorage.setItem(id, data);
+  };
+
+  return ScratchArea;
+}());
+
