@@ -1,0 +1,30 @@
+{
+  "name": "scratchpad",
+  "version": "0.0.1",
+  "homepage": "https://github.com/tOkeshu/scratchpad",
+  "authors": [
+    "Romain Gauthier <romain.gauthier@monkeypatch.me>"
+  ],
+  "description": "A small library to enable realtime collaboration between 2 users",
+  "main": "scratchpad.js",
+  "keywords": [
+    "Operational Transformation",
+    "WebRTC"
+  ],
+  "license": "Apache License 2.0",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "microevent": "~1.1.1",
+    "ot": "git://github.com/tOkeshu/ot.js.git"
+  },
+  "devDependencies": {
+    "expect": "~0.2.0",
+    "mocha": "~1.12.1"
+  }
+}
